@@ -19,6 +19,9 @@ A vision of how a cluster config file should look like, and how SRE's `Applicati
 ### kyverno-requirements
 RBAC for kyverno (needs to be installed on a cluster so every usage of kyverno will work.
 
+### local-env-setup
+Everything we did to mimic the rancher + argo environment online. Added in case it will be handy.
+
 ### node-taints
 A chart that gives nodes taints based on their names (matches a role).
 
