@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cluster-nodes
+description: Deploys xMachine CRs for each node group in a cluster
+version: 0.1.0

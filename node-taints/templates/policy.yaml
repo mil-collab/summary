@@ -1,0 +1,44 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: taint-nodes-based-on-name
+spec:
+  mutateExistingOnPolicyUpdate: true
+  background: true
+  rules:
+    - name: master-taints
+      match:
+        resources:
+          kinds: ["Node"]
+          names:
+            - "*-m*"
+      mutate:
+        targets:
+          - apiVersion: v1
+            kind: Node
+            name: |
+              {{ "{{" }} request.object.metadata.name {{ "}}" }}
+        patchesJson6902: |-
+          - op: add
+            path: "/spec/taints"
+            value:
+            - key: "node-role.kubernetes.io/control-plane"
+              effect: "NoSchedule"
+    - name: infra-taints
+      match:
+        resources:
+          kinds: ["Node"]
+          names:
+            - "*-i*"
+      mutate:
+        targets:
+          - apiVersion: v1
+            kind: Node
+            name: |
+              {{ "{{" }} request.object.metadata.name {{ "}}" }}
+        patchesJson6902: |-
+          - op: add
+            path: "/spec/taints"
+            value:
+            - key: "node-role.kubernetes.io/infra"
+              effect: "NoSchedule"

@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: "{{ .Values.clusterName }}-cluster-mutation"
+  namespace: fleet-default
+spec:
+  background: true
+  mutateExistingOnPolicyUpdate: true
+  rules:
+    - name: cluster-mutation
+      match:
+        resources:
+          kinds:
+            - provisioning.cattle.io/v1/Cluster
+          namespaces:
+            - fleet-default
+          names:
+            #- downstream
+            - {{ .Values.clusterName }}
+      mutate:
+        targets:
+          - apiVersion: provisioning.cattle.io/v1
+            kind: Cluster
+            namespace: fleet-default
+            name: {{ .Values.clusterName | quote }}
+        patchStrategicMerge:
+          spec: {{ toYaml .Values.clusterSpec | nindent 12 }}

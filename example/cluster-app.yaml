@@ -1,0 +1,30 @@
+name: "cluster-one"
+kubernetesVersion: "1.31.0"
+
+corednsReplicas: 2
+controllerReplicas: 2
+
+autoscale: false
+nodeGroups:
+  - name: "master-nodes"
+    role: "master"
+    count: 3
+    taints:
+      - key: "node-role.kubernetes.io/master"
+        value: "true"
+        effect: "NoSchedule"
+  - name: "infra-nodes"
+    role: "infra"
+    count: 2
+    taints:
+      - key: "node-role.kubernetes.io/infra"
+        value: "true"
+        effect: "NoSchedule"
+  - name: "worker-nodes"
+    role: "worker"
+    count: 5
+    taints: []
+
+sre:
+  install-metallb: true
+  install-apps-prometheus: true

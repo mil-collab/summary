@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: trident-operator
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+      generators:
+        - git:
+          repoURL: "https://github.com/your-org/your-cluster-configs.git"
+          revision: HEAD
+          directories:
+            - path: clusters/*/sre.yaml
+            - list:
+              elements:
+                - labelSelector:
+                    matchLabels:
+                      install-trident: "true"
+  template:
+    metadata:
+      name: "trident-operator-{{cluster}}"
+    spec:
+      project: default
+      source:
+        repoURL: "https://github.com/NetApp/trident-operator.git"
+        targetRevision: HEAD
+        path: charts/trident-operator
+        helm:
+          values: |
+            # Add any custom values here
+      destination:
+        server: "{{server}}"
+        namespace: trident
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      info:
+        - name: Token
+          value: "{{token}}"

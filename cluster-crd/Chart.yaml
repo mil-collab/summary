@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cluster-config
+description: Override clusters.provisioning.cattle.io configuration
+type: application
+version: 0.1.0
+appVersion: "1.16.0"

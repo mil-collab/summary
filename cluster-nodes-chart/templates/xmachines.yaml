@@ -1,0 +1,49 @@
+{{- $cluster := .Values.cluster }}
+{{- $prefixCount := dict }}
+
+{{- range $group := .Values.nodeGroups }}
+  {{- $prefix := $group.prefix }}
+  {{- $count := int $group.count }}
+  {{- $startIndex := index $prefixCount $prefix | default 1 }}
+
+  {{- range $i, $_ := until $count }}
+    {{- $index := add $startIndex $i }}
+    {{- $_ = set $prefixCount $prefix (add $index 1) }}
+
+    {{- $name := printf "%s-%s%02d" $cluster.name $prefix $index }}
+
+    {{- $nodeRes := $group.nodeResources | default dict }}
+    {{- $defaultRes := $.Values.resources }}
+    {{- $cpu := $nodeRes.cpu | default $defaultRes.cpu }}
+    {{- $mem := $nodeRes.memory | default $defaultRes.memory }}
+    {{- $disks := $nodeRes.disks | default $defaultRes.disks }}
+---
+apiVersion: cowman.org/v1alpha1
+kind: xMachine
+metadata:
+  name: {{ $name }}
+spec:
+  os: {{ $.Values.os }}
+  resources:
+    cpu: {{ int $cpu }}
+    memory: {{ int $mem }}
+    disks:
+    {{- range $disk := $disks }}
+      - name: {{ $disk.name }}
+        size: {{ int $disk.size }}
+    {{- end }}
+  virtualization:
+    region: {{ $.Values.virtualization.region }}
+    folder_path: {{ $.Values.virtualization.folder_path_prefix }}/{{ $cluster.name }}
+  k8s:
+    cluster:
+      name: {{ $cluster.name }}
+      environment: {{ $cluster.environment }}
+  asset_management:
+    team: {{ $.Values.asset_management.team }}
+    business: {{ $.Values.asset_management.business }}
+    system: {{ $.Values.asset_management.system }}
+    infra: {{ $.Values.asset_management.infra }}
+    purpose: {{ $group.role | default $.Values.asset_management.purpose }}
+  {{- end }}
+{{- end }}

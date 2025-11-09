@@ -1,0 +1,8 @@
+clusterName: downstream
+
+clusterSpec:
+  rkeConfig:
+    chartValues:
+      rke2-ingress-nginx:
+        autoscaling:
+          maxReplicas: 2

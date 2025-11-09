@@ -1,0 +1,38 @@
+cluster:
+  name: testcluster
+  environment: dev
+
+os: "ubuntu"
+resources:
+  cpu: 4
+  memory: 8
+  disks:
+    - name: root
+      size: 100
+virtualization:
+  region: west
+  folder_path_prefix: "clusters"
+
+asset_management:
+  team: platform
+  business: infra
+  system: compute
+  infra: node
+  purpose: generic
+
+nodeGroups:
+  - role: master
+    prefix: m
+    count: 1
+  - role: infra
+    prefix: i
+    count: 1
+    nodeResources:
+      cpu: 2
+      memory: 20
+  - role: worker
+    prefix: w
+    count: 1
+    nodeResources:
+      cpu: 2
+      memory: 20
