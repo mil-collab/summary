@@ -22,3 +22,6 @@ RBAC for kyverno (needs to be installed on a cluster so every usage of kyverno w
 ### node-taints
 A chart that gives nodes taints based on their names (matches a role).
 
+### vault
+Everything related to the vault K8s authentication.
+
