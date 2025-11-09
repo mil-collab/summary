@@ -10,6 +10,9 @@ Needs to be installed on `local` cluster.
 ### cluster-nodes-chart
 A chart of `xMachines` (crossplane custom CRD) - nodes of a cluster.
 
+### design
+Contains an image and excalidraw graph.
+
 ### example
 A vision of how a cluster config file should look like, and how SRE's `ApplicationSet` looks like.
 
