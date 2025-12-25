@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "node-feature-discovery.fullname" . }}-custom-scripts-config
+data:
+  ofelia.conf: |
+{{- if .Values.customScripts.garbageCollector.enable }}
+    [job-local "garbage-collector"]
+    schedule = {{ .Values.customScripts.garbageCollector.schedule }}
+    command = /ofelia/garbage-collector.sh {{ $.Values.customScripts.featuresDir }} {{ .Values.customScripts.garbageCollector.threshold }}
+{{- end }}
+{{- range .Values.customScripts.features }}
+    [job-local "{{ .name }}"]
+    schedule = @every 1s
+    command = /ofelia/{{ .name }}.sh
+{{- end }}
+{{- range .Values.customScripts.features }}
+  {{ .name }}.sh: |
+    #!/bin/sh
+    exec > "{{ $.Values.customScripts.featuresDir }}/{{ .name }}"
+{{- .script | nindent 4 }}
+{{- end }}
+  garbage-collector.sh: |
+{{- .Files.Get "scripts/garbage-collector.sh" | nindent 4 }}

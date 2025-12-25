@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "node-feature-discovery.fullname" . }}-custom-scripts
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "node-feature-discovery.fullname" . }}-custom-scripts
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/custom-scripts/configmap.yaml") . | sha256sum }}
+      labels:
+        app: {{ include "node-feature-discovery.fullname" . }}-custom-scripts
+    spec:
+      hostNetwork: {{ .Values.customScripts.hostNetwork | default false }}
+      containers:
+        - name: custom-scripts
+          image: {{ .Values.customScripts.image.repository }}:{{ .Values.customScripts.image.tag }}
+          command:
+            - ofelia
+            - daemon
+            - --config
+            - /ofelia/ofelia.conf
+          volumeMounts:
+            - name: features
+              mountPath: {{ .Values.customScripts.featuresDir }}
+            - name: config
+              mountPath: /ofelia
+          {{- if .Values.customScripts.securityContext }}
+          securityContext:
+            {{- toYaml .Values.customScripts.securityContext | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: features
+          hostPath:
+            path: {{ .Values.customScripts.featuresDir }}
+            type: DirectoryOrCreate
+        - name: config
+          configMap:
+            name: {{ include "node-feature-discovery.fullname" . }}-custom-scripts-config
+            defaultMode: 0755
+      restartPolicy: Always

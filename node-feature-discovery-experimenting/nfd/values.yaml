@@ -1,0 +1,23 @@
+customScripts:
+  image:
+    repository: custom-ofelia
+    tag: 0.3.18
+  featuresDir: /etc/kubernetes/node-feature-discovery/features.d
+  configDir: /etc/ofelia
+  features:
+    - name: myfeature
+      script: |
+        random_string=$(xxd -l16 -p /dev/urandom)
+        echo "feature.node.kubernetes.io/random=$random_string"
+      schedule: "@every 1s"
+    - name: count-iptables-rules
+      script: |
+        echo "feature.node.kubernetes.io/count-iptables-rules=$(iptables -S | wc -l)"
+      schedule: "@every 1s"
+  garbageCollector:
+    enable: true
+    threshold: 1h
+    schedule: "@every 30m"
+  hostNetwork: true
+  securityContext:
+    privileged: true
